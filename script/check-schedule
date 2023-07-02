@@ -161,7 +161,7 @@ while true; do
     fi
 
     # Notify the user with the schedule and play its wav file
-    notify-send -i scheduler-icon "$schedule" -t 10000
+    notify-send -i '/usr/share/icons/scheduler-icon.svg' "$schedule_num. $schedule" -t 10000
     mpv "$SCHEDULER_VOICES_DEST/$VOICE/$schedule_num.wav"
 
     # Sleep until completion time is reached
