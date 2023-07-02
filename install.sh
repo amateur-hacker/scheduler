@@ -126,7 +126,7 @@ if [[ ! -f "$HOME/.xprofile" ]]; then
 fi
 
 if ! grep -q "$HOME/.local/bin/check-schedule-bg" "$HOME/.xprofile"; then
-  echo "$HOME/.local/bin/check-schedule-bg" >> $HOME/.xprofile
+  echo "$HOME/.local/bin/check-schedule-bg" >> "$HOME/.xprofile"
 fi
 
 # Copy default configuration file for the scheduler program to the appropriate directory
@@ -140,6 +140,15 @@ if [ ! -d "$HOME/.local/bin" ]; then
     mkdir -p "$HOME/.local/bin"
 fi
 rsync -arvP ./script/* "$HOME/.local/bin/"
+
+if ! ps -ef | grep -v grep | grep -q "check-schedule"; then
+  echo "Starting the background process to check the schedule for the first time, it will be automatically handled after that."
+  sleep 1s
+  bash "$HOME/.local/bin/check-schedule-bg"
+  echo "Finished ..."
+else
+  :
+fi
 
 # Copy MP3 files to the appropriate directory for the scheduler program
 if [ ! -d "$HOME/Downloads" ]; then
