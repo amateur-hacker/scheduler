@@ -1,0 +1,624 @@
+#!/usr/bin/env bash
+
+######################################################################################################
+# Script Name: sch
+# Description: This script allows you to add, list, and delete schedules from the terminal.
+# Author: Amateur_Hacker
+# Version: 1.0
+######################################################################################################
+
+
+# Define script variables
+SCRIPT_NAME=$(basename "$0")
+VERSION="1.0"
+
+# Source configuration file
+eval source "$HOME/.config/scheduler/config"
+
+# Set schedule file paths
+SCHEDULE_FILE=$SCHEDULE_FILE_DESTINATION/schedule.txt
+SCHEDULE_STATUS_FILE=$SCHEDULE_STATUS_FILE_DESTINATION/schedule-status.txt
+
+# Evaulate file paths
+SCHEDULE_FILE=$(eval echo "$SCHEDULE_FILE")
+SCHEDULE_STATUS_FILE=$(eval echo "$SCHEDULE_STATUS_FILE")
+
+# Convert number to word
+number_to_word() {
+    case $1 in
+        1) echo "One" ;;
+        2) echo "Two" ;;
+        3) echo "Three" ;;
+        4) echo "Four" ;;
+        5) echo "Five" ;;
+        6) echo "Six" ;;
+        7) echo "Seven" ;;
+        8) echo "Eight" ;;
+        9) echo "Nine" ;;
+        10) echo "Ten" ;;
+        *) echo "Number out of range" ;;
+    esac
+}
+
+# Convert number to word (for ordinal position)
+number_to_word1() {
+    case $1 in
+        1) echo "first" ;;
+        2) echo "second" ;;
+        3) echo "third" ;;
+        4) echo "fourth" ;;
+        5) echo "fifth" ;;
+        6) echo "sixth" ;;
+        7) echo "seventh" ;;
+        8) echo "eighth" ;;
+        9) echo "ninth" ;;
+        10) echo "tenth" ;;
+        *) echo "Number out of range" ;;
+    esac
+}
+
+# Display script usage
+usage() {
+    echo "Usage: $SCRIPT_NAME [options]"
+    echo "Options:"
+    echo "  -a SCHEDULE     Add a new schedule"
+    echo "  -lus [NUM]      List schedules, up to NUM (default: 1)."
+    echo "  -luc [NUM]      List schedule completion status, up to NUM (default: 1)."
+    echo "  -dus [NUM]      Delete schedules, up to NUM (default: 1)"
+    echo "  -duc [NUM]      Delete schedule completion status, up to NUM (default: 1)"
+    echo "  -lss [NUM]      List the schedules with the specific schedule number of your choice."
+    echo "  -lsc [NUM]      List the schedule completion status with the specific schedule number of your choice."
+    echo "  -dss [NUM]      Delete the schedule with the specific schedule number of your choice."
+    echo "  -dsc [NUM]      Delete the completion completion status with the specific schedule number of your choice."
+    echo "  -las            List all schedules"
+    echo "  -lac            List all schedules completion status." 
+    echo "  -das            Delete all schedules"
+    echo "  -dac            Delete all completion completion status"
+    echo "  -h | --help     To see usage of sch program"
+}
+
+# Add a new schedule
+
+add_schedule() {
+  if [[ $# -eq 0 ]]; then
+    tput setaf 1 && echo -n "ERROR: "
+    tput sgr0
+    echo "Invalid schedule format."
+    tput setaf 3 && echo "Please use one of the following formats when adding a new schedule:"
+    echo ""
+    tput setaf 12 && echo "When adding a single schedule:"
+    tput sgr0
+    echo 'sch -a "01. 05:00AM python +1h"'
+    echo 'sch -a "02. 01:00PM Web Development +1h 2m"'
+    echo 'sch -a "03. 04:00PM Bash scripting +2h 3m 4s"'
+    echo ""
+    tput setaf 12 && echo "When adding multiple schedules:"
+    tput sgr0
+    echo 'sch -a "01. 05:00AM python +1h" "02. 01:00PM Web Development +1h 2m'
+    echo 'sch -a "01. 05:00AM python +1h" "02. 01:00PM Web Development +1h 2m" "03. 04:00PM "Bash scripting +1h 2m 3s"'
+    exit 1
+  fi
+
+  for schedule in "$@"; do
+    output=$(echo "$schedule" | awk -F '+' '{
+      for (i=3; i<=NF; i++) {
+        if (i > 3) {
+          printf("")
+        }
+        printf("+" $i)
+      }
+      printf("\n")
+    }')
+
+    if [[ ! "$schedule" =~ ^[0-9]{2}\.\ [0-9]{2}:[0-9]{2}(AM|PM)\ .+\ \+[0-9]{1,2}[hms]( [0-9]{1,2}[ms])?( [0-9]{1,2}[s])?$ ]]; then
+      tput setaf 1 && echo -n "ERROR: "
+      tput sgr0
+      echo "Invalid schedule format."
+      tput setaf 3 && echo "Please use one of the following formats when adding a new schedule:"
+      echo ""
+      tput setaf 12 && echo "When adding a single schedule:"
+      tput sgr0
+      echo 'sch -a "01. 05:00AM python +1h"'
+      echo 'sch -a "02. 01:00PM Web Development +1h 2m"'
+      echo 'sch -a "03. 04:00PM Bash scripting +2h 3m 4s"'
+      echo ""
+      tput setaf 12 && echo "When adding multiple schedules:"
+      tput sgr0
+      echo 'sch -a "01. 05:00AM python +1h" "02. 01:00PM Web Development +1h 2m'
+      echo 'sch -a "01. 05:00AM python +1h" "02. 01:00PM Web Development +1h 2m" "03. 04:00PM "Bash scripting +1h 2m 3s"'
+      exit 1
+    elif [[ "$output" == *"+"* ]]; then
+      tput setaf 1 && echo -n "ERROR: "
+      tput sgr0
+      echo "Invalid schedule format."
+      tput setaf 3 && echo "Please use one of the following formats when adding a new schedule:"
+      echo ""
+      tput setaf 12 && echo "When adding a single schedule:"
+      tput sgr0
+      echo 'sch -a "01. 05:00AM python +1h"'
+      echo 'sch -a "02. 01:00PM Web Development +1h 2m"'
+      echo 'sch -a "03. 04:00PM Bash scripting +2h 3m 4s"'
+      echo ""
+      tput setaf 12 && echo "When adding multiple schedules:"
+      tput sgr0
+      echo 'sch -a "01. 05:00AM python +1h" "02. 01:00PM Web Development +1h 2m'
+      echo 'sch -a "01. 05:00AM python +1h" "02. 01:00PM Web Development +1h 2m" "03. 04:00PM "Bash scripting +1h 2m 3s"'
+      exit 1
+    else
+      schedule_number=$(echo "$schedule" | grep -oE '^[0-9]+')
+      if [ "$schedule_number" -lt 10 ]; then
+        s_no=$(echo "$schedule_number" | cut -d '0' -f 2)
+        s_no=$(number_to_word1 "$s_no")
+      elif [[ $schedule_number -eq 10 ]]; then
+        s_no=$(echo "$schedule" | grep -oE '^[0-9]+')
+        s_no=$(number_to_word1 "$s_no")
+      else
+        s_no=$schedule_number
+      fi
+      existing_schedule=$(grep -E "^$schedule_number\." "$SCHEDULE_FILE")
+      if [ -n "$existing_schedule" ]; then
+        sed -i "s|^$schedule_number\..*|$schedule|" "$SCHEDULE_FILE"
+        echo "Updated $s_no schedule in schedule file."
+      elif [ "$schedule_number" -gt 10 ]; then
+        tput setaf 9 && echo "Can't make the $s_no schedule, because you can only make up to 10 schedules in a day."
+      else
+        sed -i "/^$schedule_number\./d" "$SCHEDULE_FILE"
+        awk -v sch="$schedule" -v num="$schedule_number" '
+          BEGIN {
+            inserted = 0;
+          }
+          {
+            if ($0 ~ /^[0-9]+/) {
+              if ($1 > num && inserted == 0) {
+                print sch;
+                inserted = 1;
+              }
+            }
+            print;
+          }
+          END {
+            if (inserted == 0) {
+              print sch;
+            }
+          }
+        ' "$SCHEDULE_FILE" > "$SCHEDULE_FILE.tmp"
+        mv "$SCHEDULE_FILE.tmp" "$SCHEDULE_FILE"
+        echo "Added $s_no schedule to schedule file."
+      fi
+    fi
+  done
+}
+
+# List schedule (up to number)
+list_up_to_schedules() {
+  num_to_display="$1"
+
+  if ! grep -q 'AM\|PM' "$SCHEDULE_FILE" && [[ -n "$num_to_delete" ]] && [[ $num_to_delete -lt 11 ]]; then
+    tput setaf 9 && echo "No schedule yet."
+  elif ! grep -q 'AM\|PM' "$SCHEDULE_FILE" && [[ -z "$num_to_delete" ]] && [[ $num_to_delete -lt 11 ]]; then
+    tput setaf 9 && echo "No schedule yet."
+  else
+    if [[ $num_to_display -lt 11 ]]; then
+      if [[ $LIST_UP_TO_SCHEDULE_DIRECTION == "first" ]]; then
+        grep "AM\|PM" "$SCHEDULE_FILE" | head -n "${num_to_display:-1}"
+      elif [[ $LIST_UP_TO_SCHEDULE_DIRECTION == "last" ]]; then
+        grep "AM\|PM" "$SCHEDULE_FILE" | tail -n "${num_to_display:-1}"
+      fi
+    elif [[ $num_to_display -gt 10 ]]; then
+      tput setaf 9 && echo -n "ERROR: "
+      tput sgr0
+      echo "Argument out of range."
+      tput sgr0
+      tput setaf 3 && echo "Use an argument value less than 11."
+    fi
+  fi
+}
+
+# List completion (up to number)
+list_up_to_completions() {
+  num_to_display="$1"
+
+  if ! grep -q 'Schedule-' "$SCHEDULE_STATUS_FILE" && [[ -n "$num_to_display" ]] && [[ $num_to_display -lt 11 ]]; then
+    tput setaf 9 && echo "No schedule status yet."
+  elif ! grep -q 'Schedule-' "$SCHEDULE_STATUS_FILE" && [[ -z "$num_to_display" ]] && [[ $num_to_display -lt 11 ]]; then
+    tput setaf 9 && echo "No schedule status yet."
+  else
+    if [[ $num_to_display -lt 11 ]]; then
+      if [[ $LIST_UP_TO_SCHEDULE_COMPLETION_STATUS_DIRECTION == "first" ]]; then
+        grep "Schedule-" "$SCHEDULE_STATUS_FILE" | head -n "${num_to_display:-1}"
+      elif [[ $LIST_UP_TO_SCHEDULE_COMPLETION_STATUS_DIRECTION == "last" ]]; then
+      grep "Schedule-" "$SCHEDULE_STATUS_FILE" | tail -n "${num_to_display:-1}"
+      fi
+    elif [[ $num_to_display -gt 10 ]]; then
+      tput setaf 9 && echo -n "ERROR: "
+      tput sgr0
+      echo "Argument out of range."
+      tput sgr0
+      tput setaf 3 && echo "Use an argument value less than 11."
+    fi
+  fi
+}
+
+# Delete schedule (up to number)
+delete_up_to_schedule() {
+  num_to_delete="$1"
+
+  if ! grep -q 'AM\|PM' "$SCHEDULE_FILE" && [[ -n "$num_to_delete" ]] && [[ $num_to_delete -lt 11 ]]; then
+    tput setaf 9 && echo "No schedule yet."
+    exit 1
+  elif ! grep -q 'AM\|PM' "$SCHEDULE_FILE" && [[ -z "$num_to_delete" ]] && [[ $num_to_delete -lt 11 ]]; then
+    tput setaf 9 && echo "No schedule yet."
+    exit 1
+  else
+    word=$(number_to_word "$num_to_delete")
+    if [[ $num_to_delete -lt 11 ]]; then
+      if [[ $DELETE_UP_TO_SCHEDULE_DIRECTION == "first" ]]; then
+        { awk -v num="${num_to_delete:-1}" 'NR>11 && /AM|PM/{if (++count<=num) next}1' "$SCHEDULE_FILE"; } > temp.txt && mv temp.txt "$SCHEDULE_FILE"
+      elif [[ $DELETE_UP_TO_SCHEDULE_DIRECTION == "last" ]]; then
+        { { tac "$SCHEDULE_FILE" | awk -v num="${num_to_delete:-1}" '/AM|PM/{if (++count<=num) next}1' | tac; } > temp.txt && mv temp.txt "$SCHEDULE_FILE"; }
+      fi
+      if [[ $num_to_delete == "1" ]] || [[ $num_to_delete == "" ]]; then
+        if [[ $DELETE_UP_TO_SCHEDULE_DIRECTION == "first" ]]; then
+          echo "One schedule from the beginning has been deleted from the schedule file."
+        elif [[ $DELETE_UP_TO_SCHEDULE_DIRECTION == "last" ]]; then
+          echo "Last schedule has been deleted from the schedule file."
+        fi
+      else
+        if [[ $DELETE_UP_TO_SCHEDULE_DIRECTION == "first" ]]; then
+          echo "$word schedules from the beginning have been deleted from the schedule file."
+        elif [[ $DELETE_UP_TO_SCHEDULE_DIRECTION == "last" ]]; then
+          echo "$word schedules from the last have been deleted from the schedule file."
+        fi
+      fi
+    elif [[ $num_to_delete -gt 10 ]]; then
+      tput setaf 1 && echo -n "ERROR: "
+      tput sgr0
+      echo "Argument out of range."
+      tput sgr0
+      tput setaf 3 && echo "Use an argument value less than 11."
+    fi
+  fi
+}
+
+
+# Delete completion (up to number)
+delete_up_to_completion() {
+  num_to_delete="$1"
+
+  if ! grep -q 'Schedule-' "$SCHEDULE_STATUS_FILE" && [[ -n "$num_to_delete" ]] && [[ $num_to_delete -lt 11 ]]; then
+    tput setaf 9 && echo "No schedule yet."
+  elif ! grep -q 'Schedule-' "$SCHEDULE_STATUS_FILE" && [[ -z "$num_to_delete" ]] && [[ $num_to_delete -lt 11 ]]; then
+    tput setaf 9 && echo "No schedule yet."
+  else
+    word=$(number_to_word "$num_to_delete")
+    if [[ $num_to_delete -lt 11 ]]; then
+      if [[ $DELETE_UP_TO_SCHEDULE_DIRECTION == "first" ]]; then
+        { awk -v num="${num_to_delete:-1}" 'NR>11 && /Schedule-/{if (++count<=num) next}1' "$SCHEDULE_STATUS_FILE"; } > temp.txt && mv temp.txt "$SCHEDULE_STATUS_FILE"
+      elif [[ $DELETE_UP_TO_SCHEDULE_DIRECTION == "last" ]]; then
+        { { tac "$SCHEDULE_STATUS_FILE" | awk -v num="${num_to_delete:-1}" '/Schedule-/{if (++count<=num) next}1' | tac; } > temp.txt && mv temp.txt "$SCHEDULE_STATUS_FILE"; }
+      fi
+
+      if [[ $num_to_delete == "1" ]] || [[ $num_to_delete == "" ]]; then
+        if [[ $DELETE_UP_TO_SCHEDULE_DIRECTION == "first" ]]; then
+          echo "The status of one schedule from the beginning has been deleted from the schedule status file."
+        elif [[ $DELETE_UP_TO_SCHEDULE_DIRECTION == "last" ]]; then
+          echo "Last schedule status has been deleted from the schedule satus file."
+        fi
+      else
+        if [[ $DELETE_UP_TO_SCHEDULE_DIRECTION == "first" ]]; then
+          echo -n "The "
+          echo "status of $word schedules from the beginning have been deleted from the schedule status file." | tr '[:upper:]' '[:lower:]'
+        elif [[ $DELETE_UP_TO_SCHEDULE_DIRECTION == "last" ]]; then
+          echo "$word schedules status from the last have been deleted from the schedule file."
+        fi
+      fi
+    elif [[ $num_to_delete -gt 10 ]]; then
+      tput setaf 9 && echo -n "ERROR: "
+      tput sgr0
+      echo "Argument out of range."
+      tput sgr0
+      tput setaf 3 && echo "Use an argument value less than 11."
+    fi
+  fi
+}
+
+# List specific number of  schedule
+list_specific_schedule() {
+  schedule_num="$1"
+
+  if ! grep -q 'AM\|PM' "$SCHEDULE_FILE" && [[ -n "$schedule_num" ]] && [[ $schedule_num -lt 11 ]]; then
+    tput setaf 9 && echo "No schedule yet."
+  elif [[ $schedule_num -gt 10 ]]; then
+    tput setaf 9 && echo -n "ERROR: "
+    tput sgr0
+    echo "Argument out of range."
+    tput sgr0
+    tput setaf 3 && echo "Use an argument value less than 11."
+  elif [[ -z "$schedule_num" ]]; then
+    tput setaf 9 && echo -n "ERROR: "
+    tput sgr0
+    echo  "The Argument cannot be empty with the -sl flag because no default value exist." 
+    tput setaf 3 && echo "please use the below format when listing the schedule with a specific number."
+    tput setaf 6 && echo 'sch -lss "1"'
+    tput setaf 6 && echo 'sch -lss "4"'
+  elif ! [[ "$schedule_num" =~ ^[0-9]+$ ]]; then
+    tput bold setaf 1 && echo "Invalid schedule number: $schedule_num"
+  else
+    if [[ "$schedule_num" -eq "10" ]]; then
+      serial_number="$schedule_num\."
+    else
+      serial_number="0$schedule_num\."
+    fi
+    number=$(number_to_word1 "$schedule_num") 
+    schedule=$(grep "$serial_number" "$SCHEDULE_FILE")
+    if [[ -z "$schedule" ]]; then
+      tput setaf 9 && echo "Schedule $number not found."
+    else
+      echo "$schedule"
+    fi
+  fi
+}
+
+# List specific number of completion
+list_specific_completion() {
+  schedule_num="$1"
+
+  if ! grep -q 'Schedule-' "$SCHEDULE_STATUS_FILE" && [[ -n "$schedule_num" ]] && [[ $schedule_num -lt 11 ]]; then
+    tput setaf 9 && echo "No schedule status yet."
+  elif [[ $schedule_num -gt 10 ]]; then
+    tput setaf 9 && echo -n "ERROR: "
+    tput sgr0
+    echo "Argument out of range."
+    tput setaf 3 && echo "Use an argument value less than 11."
+  elif [[ -z "$schedule_num" ]]; then
+    tput setaf 9 && echo -n "ERROR: "
+    tput sgr0
+    echo  "The Argument cannot be empty with the -lsc flag because no default value exist." 
+    tput setaf 3 && echo "please use the below format when listing the completion status of your schedule with a specific number."
+    tput setaf 6 && echo 'sch -lsc "1"'
+    tput setaf 6 && echo 'sch -lsc "4"'
+  elif ! [[ "$schedule_num" =~ ^[0-9]+$ ]]; then
+    tput bold setaf 1 && echo "Invalid schedule number: $schedule_num"
+  else
+    if [[ "$schedule_num" -eq "10" ]]; then
+      serial_number="$schedule_num\."
+    else
+      serial_number="0$schedule_num\."
+    fi
+    number=$(number_to_word1 "$schedule_num") 
+    schedule=$(grep "$serial_number" "$SCHEDULE_STATUS_FILE")
+    if [[ -z "$schedule" ]]; then
+      tput setaf 9 && echo "Status of $number schedule not found."
+    else
+      echo "$schedule"
+    fi
+  fi
+}
+
+# Delete specific number of schedule
+delete_specific_schedule() {
+
+  schedule_num="$1"
+  if ! grep -q 'AM\|PM' "$SCHEDULE_FILE" && [[ -n "$schedule_num" ]] && [[ $schedule_num -lt 11 ]]; then
+    tput setaf 9 && echo "No schedule yet."
+  elif [[ $schedule_num -gt 10 ]]; then
+    tput setaf 9 && echo -n "ERROR: "
+    tput sgr0
+    echo "Argument out of range."
+    tput sgr0
+    tput setaf 3 && echo "Use an argument value less than 11."
+  elif [[ -z "$schedule_num" ]]; then
+    tput setaf 9 && echo -n "ERROR: "
+    tput sgr0
+    echo  "The Argument cannot be empty with the -dss flag because no default value exist." 
+    tput setaf 3 && echo "please use the below format when deleting the schedule with a specific number."
+    tput setaf 6 && echo 'sch -dss "1"'
+    tput setaf 6 && echo 'sch -dss "4"'
+  elif ! [[ "$schedule_num" =~ ^[0-9]+$ ]]; then
+    tput setaf 9 && echo -n "Invalid Schedule Number: "
+    tput sgr0
+    echo "$schedule_num"
+  else
+    number=$(number_to_word1 "$schedule_num") 
+    if [[ "$schedule_num" -eq "10" ]]; then
+      serial_number="$schedule_num."
+      deleted_line=$(sed -n "/^$serial_number/p" "$SCHEDULE_FILE")
+      if grep -q "^$serial_number" "$SCHEDULE_FILE"; then
+        sed -i "/^$serial_number/d" "$SCHEDULE_FILE"
+        upper_case_number="${number^}"
+        echo "$deleted_line ==> $upper_case_number Schedule Deleted!"
+      else
+        echo -n "$number " | sed 's/.*/\u&/'
+        echo "schedule not found."
+      fi  
+    elif ((schedule_num >= 1 && schedule_num <= 9)); then
+      serial_number="0$schedule_num."
+      deleted_line=$(sed -n "/^$serial_number/p" "$SCHEDULE_FILE")
+      if grep -q "^$serial_number" "$SCHEDULE_FILE"; then
+        sed -i "/^$serial_number/d" "$SCHEDULE_FILE"
+        upper_case_number="${number^}"
+        echo "$deleted_line ==> $upper_case_number Schedule Deleted!"
+      else
+        tput setaf 9 && echo -n "$number " | sed 's/.*/\u&/'
+        echo "schedule not found."
+      fi
+    fi
+  fi
+}
+
+# Delete specific number of completion
+delete_specific_completion() {
+    schedule_num="$1"
+    if ! grep -q 'Schedule-' "$SCHEDULE_STATUS_FILE" && [[ -n "$schedule_num" ]] && [[ $schedule_num -lt 11 ]]; then
+      tput setaf 9 && echo "No schedule status yet."
+    elif [[ $schedule_num -gt 10 ]]; then
+      tput setaf 9 && echo -n "ERROR: "
+      tput sgr0
+      echo "Argument out of range."
+      tput sgr0
+      tput setaf 3 && echo "Use an argument value less than 11."
+    elif [[ -z "$schedule_num" ]]; then
+      tput bold setaf 1 && echo -n "ERROR: "
+      tput sgr0
+      echo  "The Argument cannot be empty with the -dsc flag because no default value exist." 
+      tput setaf 3 && echo "please use the below format when deleting the completion status of schedule with a specific number."
+      tput setaf 6 && echo 'sch -dsc "1"'
+      tput setaf 6 && echo 'sch -dsc "4"'
+    elif ! [[ "$schedule_num" =~ ^[0-9]+$ ]]; then
+      tput setaf 9 && echo -n "Invalid Schedule Number: "
+      tput sgr0
+      echo "$schedule_num"
+    else
+      number=$(number_to_word1 "$schedule_num") 
+      if [[ "$schedule_num" -eq "10" ]]; then
+        serial_number="$schedule_num\."
+        deleted_line=$(sed -n "/Schedule-$serial_number/p" "$SCHEDULE_STATUS_FILE")
+        if grep -q "Schedule-$serial_number" "$SCHEDULE_STATUS_FILE"; then
+          sed -i "/Schedule-$serial_number/d" "$SCHEDULE_STATUS_FILE"
+          upper_case_number="${number^}"
+          echo "$deleted_line ==> $upper_case_number Schedule Status Deleted!"
+        else
+          echo -n "$number " | sed 's/.*/\u&/'
+          echo "Schedule status not found."
+        fi  
+      elif ((schedule_num >= 1 && schedule_num <= 9)); then
+        serial_number="0$schedule_num."
+        deleted_line=$(sed -n "/Schedule-$serial_number/p" "$SCHEDULE_STATUS_FILE")
+        if grep -q "Schedule-$serial_number" "$SCHEDULE_STATUS_FILE"; then
+          sed -i "/Schedule-$serial_number/d" "$SCHEDULE_STATUS_FILE"
+          upper_case_number="${number^}"
+          echo "$deleted_line ==> $upper_case_number Schedule Status Deleted!"
+        else
+          tput setaf 9 && echo -n "$number " | sed 's/.*/\u&/'
+          echo "Schedule status not found."
+        fi
+      fi
+    fi
+}
+
+# List all schedules
+list_all_schedules() {
+    schedule_num=$1
+    if [[ -n $schedule_num ]]; then
+      tput setaf 9 && echo "The -las flag doesn't take any argument."
+    elif ! grep -q 'AM\|PM' "$SCHEDULE_FILE"; then
+      tput setaf 9 && echo "No schedule yet."
+    else
+      grep "AM\|PM" "$SCHEDULE_FILE"
+    fi
+}
+
+# List all completions
+list_all_completions() {
+  schedule_num=$1
+  if [[ -n $schedule_num ]]; then
+    tput setaf 9 && echo "The -lac flag doesn't take any argument."
+  elif ! grep -q 'Schedule-' "$SCHEDULE_STATUS_FILE"; then
+    tput setaf 9 && echo "No schedule status yet."
+  else
+    all_completiont_status=$(grep "Schedule-" "$SCHEDULE_STATUS_FILE")
+    echo "$all_completiont_status"
+  fi
+}
+
+# Delete all schedules
+delete_all_schedules() {
+  schedule_num=$1
+  if [[ -n $schedule_num ]]; then
+    tput setaf 9 && echo "The -das flag doesn't take any argument."
+  elif ! grep -q 'AM\|PM' "$SCHEDULE_FILE"; then
+      tput setaf 9 && echo "No schedule yet."
+  else
+      sed -i '/AM\|PM/d' "$SCHEDULE_FILE"
+      echo "All Schedules Deleted!"
+  fi
+}
+
+# Delete all completions
+delete_all_completions() {
+  schedule_num=$1
+  if [[ -n $schedule_num ]]; then
+    tput setaf 9 && echo "The -dac flag doesn't take any argument."
+  elif ! grep -q 'Schedule-' "$SCHEDULE_STATUS_FILE"; then
+      tput setaf 9 && echo "No schedule status yet."
+  else
+      sed -i '/Schedule-/d' "$SCHEDULE_STATUS_FILE"
+      echo "All Schedules Completion status Deleted!"
+  fi
+}
+# Main script logic
+main() {
+    # Process command line arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -a)
+                shift 
+                add_schedule "$@"
+                exit 0
+                ;;
+            -lus)
+                shift
+                list_up_to_schedules "$@"
+                ;;
+            -luc)
+                shift
+                list_up_to_completions "$@"
+                ;;
+            -dus)
+                shift
+                delete_up_to_schedule "$@"
+                ;;
+            -duc)
+                shift
+                delete_up_to_completion "$@"
+                ;;
+            -lss)
+                shift
+                list_specific_schedule "$@"
+                ;;
+            -lsc)
+                shift
+                list_specific_completion "$@"
+                ;;
+            -dss)
+                shift
+                delete_specific_schedule "$@"
+                ;;
+            -dsc)
+                shift
+                delete_specific_completion "$@"
+                ;;
+            -las)
+                shift
+                list_all_schedules "$@"
+                ;;
+            -lac)
+                shift
+                list_all_completions "$@"
+                ;;
+            -das)
+                shift
+                delete_all_schedules "$@"
+                ;;
+            -dac)
+                shift
+                delete_all_completions "$@"
+                ;;
+            -h|--help)
+                usage
+                ;;
+            -v|--version)
+                echo "Sch $VERSION"
+                ;;
+            *)
+                echo "Invalid option: $1"
+                usage
+                exit 0 
+                ;;
+        esac
+        shift
+    done
+}
+
+# Run the script
+main "$@"

@@ -1,0 +1,220 @@
+#+title: Scheduler
+
+* TABLE OF CONTENTS :toc:
+- [[#about-scheduler][About Scheduler]]
+- [[#schedulercli][Scheduler(CLI)]]
+  - [[#options][Options:]]
+  - [[#usage][Usage:]]
+- [[#schedulergui][Scheduler(GUI)]]
+- [[#installation-instructions][Installation Instructions]]
+- [[#installing-scheduler][Installing Scheduler]]
+
+* About Scheduler
+#+CAPTION: Scheduler Scrot
+#+ATTR_HTML: :alt Scheduler scrot :title Scheduler Scrot :align left
+[[https://gitlab.com/amateur_hacker/dotfiles/-/raw/master/screenshots/sch-preview.png]]
+
+Scheduler is a program that reads a schedule file and performs scheduled tasks at their designated times. It provides audio notifications for the schedule and prompts the user to confirm completion. The program features a Command Line Interface (CLI) written in Bash, which enables users to add, list, and delete scheduled tasks. Additionally, it includes a Graphical User Interface (GUI) application written in Python using the Gtk library, which offers the same functionality as the CLI.
+
+* Scheduler(CLI)
+
+The command line interface (CLI) for Scheduler is named "sch" and is written in Bash, featuring several command line options.
+
+** Options:
+
+- -a "SCHEDULE": add a new schedule to the schedule file
+- -lus "NUM": List schedules, up to NUM (default: 1).
+- -luc "NUM": List schedules completion status, up to NUM (default: 1).
+- -dus "NUM": Delete schedules, up to NUM (default: 1).
+- -duc "NUM": Delete schedules completion status, up to NUM (default: 1).
+- -lss "NUM": List the schedule with the specific  number of your choice.
+- -lsc "NUM": List the schedule completeion status with the specific  number of your choice.
+- -dss "NUM": Delete the schedule with the specific  number of your choice.
+- -dsc "NUM": Delete the schedule completeion status with the specific  number of your choice.
+- -las: List all schedules.
+- -lac: List all schedules completion status.
+- -das: Delete all schedules.
+- -dac: Delete all schedules completion status.
+- -h | --help: To see usage of sch program.
+
+** Usage:
+
+*** To add a new schedule:
+- sch -a "SCHEDULE"
+
+**** Examples:
+
+**** When adding a single schedule:
+#+begin_example
+sch -a "01. 09:45AM Python +2h"
+sch -a "02. 01:45PM Web Development +3h 2m"
+sch -a "03. 03:45PM Bash Scripting +4h 2m 5s"
+#+end_example
+
+**** When adding multiple schedules:
+#+begin_example
+sch -a "01. 09:45AM Python +2h" "02. 01:45PM Web Development +3h 2m" "03. 03:45PM Bash Scripting +4h 2m 5s"
+sch -a "01. 09:45AM python +2h" "02. 01:45PM Web Development +3h 2m"
+#+end_example
+
+**** Schedule Format:
+
+|---------------+---------------+-----------------+-----------------|
+| serial number | Schedule Time | Schedule        | Completion Time |
+|---------------+---------------+-----------------+-----------------|
+|           01. | 09:45AM       | python          | +2h             |
+|---------------+---------------+-----------------+-----------------|
+|           02. | 01:45PM       | Web Development | +3h 2m          |
+|---------------+---------------+-----------------+-----------------|
+|           03. | 03:45PM       | Bash Scripting  | +4h 2m 5s       |
+|---------------+---------------+-----------------+-----------------|
+
+**** Note:
+1. The schedule you write should always be enclosed in double quotes.
+2. When using double quotes, begin with a serial number followed by a period, using this format: 01., 02., 03., 10.
+3. Then, leave a single space and specify the initial/start time of your schedule using the 12-hour format with AM or PM, such as: 09:45AM, 01:10PM, 03:15AM.
+4. Do not include any spaces between the time and the AM/PM designation.
+5. Then, leave another space and specify the schedule that you want to do at that particular time.
+6. Ensure that each word in the schedule description is separated by only a single space.
+7. Then, leave another space and specify your completion time using the "+" symbol, followed by a time duration in this format: +2h, +3h 2m, +4h 2m 5s.
+8. You can only make up to 10 schedules in a day. To create additional schedules, you will either need to delete some existing schedules from those 10 schedules or utilize the overwrite functionality, as mentioned below in the features section.
+
+**** Features:
+1. If you write the schedule with the same number again, it will overwrite the previous one. You don't need to worry about adding the schedule in a sequential manner because it will be automatically handled. The schedule will be rearranged automatically based on their respective numbers.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+*** List schedules, up to NUM (default: 1).
+- sch -lus "NUM"
+**** Examples:
+#+begin_example
+sch -lus "3"
+sch -lus 4
+#+end_example
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+*** List schedules completion status, up to NUM (default: 1).
+- sch -luc "NUM"
+**** Examples:
+#+begin_example
+sch -luc "3"
+sch -luc 4
+#+end_example
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+*** Delete schedules, up to NUM (default: 1).
+- sch -dus "NUM"
+**** Examples:
+#+begin_example
+sch -dus "3"
+sch -dus 4
+#+end_example
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+*** Delete schedules completion status, up to NUM (default: 1).
+- sch -duc "NUM"
+**** Examples:
+#+begin_example
+sch -duc "3"
+sch -duc 4
+#+end_example
+**** Note: 
+1. By editing the .config/scheduler/config file, you can modify the listing order direction of -lus, luc, dus, duc flags.
+2. Double quotes are optional for enclosing argument in almost all flags expect when using -a flag.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+*** List the specific schedule.
+- sch -lss "NUM"
+**** Examples:
+#+begin_example
+sch -lss "3"
+sch -lss 4
+#+end_example
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+*** List the specific schedules completions status.
+- sch -lsc "NUM"
+**** Examples:
+#+begin_example
+sch -lsc "3"
+sch -lsc 4
+#+end_example
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+*** Delete the specific schedule.
+- sch -dss "NUM"
+**** Examples:
+#+begin_example
+sch -dss "3"
+sch -dss 4
+#+end_example
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+*** Delete the specific schedule completion status.
+- sch -dsc "NUM"
+**** Examples:
+#+begin_example
+sch -dsc "3"
+sch -dsc 4
+#+end_example
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+*** List all schedules
+- sch -las
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+*** List all schedules completion status:
+- sch -lac
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+*** Delete all schedules:
+- sch -das
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+*** Delete all schedules completion status:
+- sch -dac
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+*** List last schedule
+- sch -lus
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+*** List last schedule completion status
+- sch -luc
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+**** Note:
+1. The "lus" and "luc" flags will work when the "LIST_UP_TO_SCHEDULE_DIRECTION" and "LIST_UP_TO_COMPLETION_DIRECTION" settings are set to "last" in the .config/scheduler/config file.
+2. The "lus" and "luc" flag working because the default argument is set to 1 for both list up to schedule and list up to completion status.
+
+
+* Scheduler(GUI)
+It has same features as mentioned above for CLI version but it is a gui version written in python.
+
+* Installation Instructions
+- This program is designed only for linux users.
+- This program can be installed on Arch, Ubuntu/Debian, Fedora, and OpenSUSE based distributions.
+- To install this program on your Linux distribution, please follow the instructions below:
+
+* Installing Scheduler
+- To install scheduler, you need to clone this repository and run the ~install.sh~ script.
+#+begin_example
+git clone https://gitlab.com/amateur_hacker/scheduler.git
+cd scheduler
+./install.sh
+#+end_example
+~NOTE:~ Dependencies will automatically install from install.sh script.

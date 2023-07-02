@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+#
+#  ███████╗ ██████╗██╗  ██╗███████╗██████╗ ██╗   ██╗██╗     ███████╗██████╗ 
+#  ██╔════╝██╔════╝██║  ██║██╔════╝██╔══██╗██║   ██║██║     ██╔════╝██╔══██╗
+#  ███████╗██║     ███████║█████╗  ██║  ██║██║   ██║██║     █████╗  ██████╔╝
+#  ╚════██║██║     ██╔══██║██╔══╝  ██║  ██║██║   ██║██║     ██╔══╝  ██╔══██╗
+#  ███████║╚██████╗██║  ██║███████╗██████╔╝╚██████╔╝███████╗███████╗██║  ██║
+#  ╚══════╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═════╝  ╚═════╝ ╚══════╝╚══════╝╚═╝  ╚═╝
+#
+# https://gitlab.com/amateur_hacker/scheduler.git
+
+# shellcheck disable=SC2034
+
+# The VOICE variable allows you to change the default voice for the scheduler CLI version.. There are three voice options available: "charles", "lucas", and "olivia". Olivia is the default, but you can change it to a male voice if you prefer.
+
+VOICE="olivia"
+
+# The SCHEDULE_FILE_DESTINATION and SCHEDULE_STATUS_FILE_DESTINATION variables are two main files used by the scheduler program (for CLI version). You can change their default paths by using these variables, but keep in mind that you have to use $HOME instead of /home/username, ~(tilde) or any other specific username. By default, both of these variables are set to $HOME, which means that the files will be located in the /home/username path.
+# Note: When creating your own path, avoid using a forward slash (/) at the end.
+
+SCHEDULE_FILE_DESTINATION="$HOME"
+SCHEDULE_STATUS_FILE_DESTINATION="$HOME"
+
+# The variables LIST_UP_TO_SCHEDULE_DIRECTION and LIST_UP_TO_SCHEDULE_COMPLETION_STATUS_DIRECTION enable you to change the listing direction of schedules and their completion status, respectively for scheduler CLI version. There are two options available: "first" and "last". By default, both variables are set to last, which means that both will list upto from last.
+
+LIST_UP_TO_SCHEDULE_DIRECTION="last"
+LIST_UP_TO_SCHEDULE_COMPLETION_STATUS_DIRECTION="last"
+
+# The variables DELETE_UP_TO_SCHEDULE_DIRECTION and DELETE_UP_TO_SCHEDULE_COMPLETION_STATUS_DIRECTION enable you to change the deleting direction of schedules and their completion status, respectively for scheduler CLI version. There are two options available: "first" and "last". By default, both of these variables are set to last, which means that both will delete upto from last.
+
+DELETE_UP_TO_SCHEDULE_DIRECTION="last"
+DELETE_UP_TO_SCHEDULE_COMPLETION_STATUS_DIRECTION="last"
+
+# The DEFAULT_COMPLETION_PROMPT variable is used to set the default prompt for confirming the completion of a schedule for scheduler CLI version. By default, this variable is set to "rofi", but you can use other options like "dmenu".
+
+DEFAULT_COMPLETION_PROMPT="rofi"

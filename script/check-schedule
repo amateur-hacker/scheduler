@@ -1,0 +1,205 @@
+#!/usr/bin/env bash
+
+######################################################################################################
+# Script Name: check-schedule
+# Description: A script that reads a schedule file and performs schedule at the scheduled times,
+#              playing audio notifications for the schedule and prompting the user to confirm completion.
+# Author: Amateur_Hacker
+# Version: 1.0
+######################################################################################################
+
+# This variable specifies the path of the lock file that is used to prevent multiple instances of the scheduler program from running simultaneously.
+LOCKFILE=/tmp/scheduler.lock
+
+# Include scheduler config script
+eval source "$HOME/.config/scheduler/config"
+
+# Include motivational-quotes script
+eval source "$HOME/.local/bin/motivational-quotes"
+
+# This variable specifies the destination directory for the scheduler voices that are used to provide voice-based reminders.
+SCHEDULER_VOICES_DEST="$HOME/Downloads/scheduler-voices"
+
+# This variable specifies the full path of the schedule file, based on the $SCHEDULE_FILE_DEST variable. The value is stored in a double-quoted string and is evaluated using the eval command.
+SCHEDULE_FILE=$SCHEDULE_FILE_DESTINATION/schedule.txt
+SCHEDULE_FILE=$(eval echo "$SCHEDULE_FILE")
+
+# This variable specifies the full path of the schedule status file, based on the $SCHEDULE_FILE_DEST variable. The value is stored in a double-quoted string and is evaluated using the eval command.
+SCHEDULE_STATUS_FILE=$SCHEDULE_STATUS_FILE_DESTINATION/schedule-status.txt
+SCHEDULE_STATUS_FILE=$(eval echo "$SCHEDULE_STATUS_FILE")
+
+# Define the motivational_quotes array
+declare -a motivational_quotes=("${motivational_quotes[@]}")
+
+# This function checks whether a file specified by the $SCHEDULE_FILE variable exists. If it does not exist, it creates the file using the touch command. 
+function check_schedule_file {
+  if [[ ! -f "$SCHEDULE_FILE" ]]; then
+    touch "$SCHEDULE_FILE"
+  fi
+}
+
+# This function checks whether a file specified by the $SCHEDULE_STATUS_FILE variable exists. If it does not exist, it creates the file using the touch command.
+function check_schedule_status_file {
+  if [[ ! -f "$SCHEDULE_STATUS_FILE" ]]; then
+    touch "$SCHEDULE_STATUS_FILE"
+  fi
+}
+
+# Get a random quote from the motivational_quotes array for schedule file.
+rand_quote=${motivational_quotes[$RANDOM % ${#motivational_quotes[@]}]}
+
+# This function writes a message to the schedule file, which includes the current date, day, a random quote, and a personalized greeting to the user. 
+function write_to_schedule_file {
+  cat <<EOF > "$SCHEDULE_FILE"
+###########################################################################################################
+#
+# DATE: $todays_date || DAY: $todays_day
+#
+# $rand_quote
+#
+# Hello $LOGNAME, I hope you're doing well and that you'll find our scheduler program helpful and enjoyable
+# for managing your schedule.
+#
+###########################################################################################################
+
+EOF
+}
+
+# Get a random quote from the motivational_quotes array for schedule status file.
+rand_quote=${motivational_quotes[$RANDOM % ${#motivational_quotes[@]}]}
+
+# This function writes a message to the schedule status file, which includes the current date, day, a random quote, and a personalized greeting to the user. 
+function write_to_schedule_status_file {
+  cat <<EOF > "$SCHEDULE_STATUS_FILE"
+###########################################################################################################
+#
+# DATE: $todays_date || DAY: $todays_day
+#
+# $rand_quote
+#
+# Hello $LOGNAME, I hope you're doing well and that you'll find our scheduler program helpful and enjoyable
+# for managing your schedule.
+#
+###########################################################################################################
+
+EOF
+}
+
+# Check if the lock file exists and the PID stored in it is still running
+if [[ -e $LOCKFILE ]] && kill -0 "$(cat $LOCKFILE)" 2>/dev/null; then
+  echo "Scheduler is already running"
+  exit 1
+fi
+
+# Store the PID of the current process in the lock file
+echo $$ > $LOCKFILE
+
+# Continuously check the current time against the schedule file
+while true; do
+
+  # Call the function for each file
+  check_schedule_file
+  check_schedule_status_file
+
+  current_time=$(date +%I:%M%p)
+
+  todays_date=$(date +%d-%m-%Y) # get today's date in DD-MM-YYYYformat
+  todays_day=$(date +%A)
+
+  # Check if today's date is already present in the schedule file
+  if grep -q "$todays_date" "$SCHEDULE_FILE"; then
+    # If date is already present, do nothing
+    :
+  else
+    # Append the output of the write_to_schedule_file function to the schedule.txt file.
+    write_to_schedule_file > schedule.txt
+  fi
+
+  if grep -q "$todays_date" "$SCHEDULE_STATUS_FILE"; then
+    # If date is already present, do nothing
+    :
+  else
+    # Append the output of the write_to_schedule_file function to the schedule-status.txt file.
+    write_to_schedule_status_file > schedule-status.txt
+  fi
+
+  # Extract the schedule_num, schedule_time, schedule, completion_time from the schedule file based on the current time.
+  schedule_num=$(grep "$current_time" "$SCHEDULE_FILE" |  cut -d '.' -f1)
+  schedule_time=$(grep "$current_time" "$SCHEDULE_FILE" | cut -d ' ' -f2)
+  schedule=$(grep "$current_time" "$SCHEDULE_FILE" | awk '{for(i=3;i<=NF-2;i++) printf "%s ",$i; print $(NF-1)}' | cut -d '+' -f1)
+  completion_time=$(grep "$current_time" "$SCHEDULE_FILE" | awk -F '+' '{print $2}' | awk '{$1=$1;print}')
+
+  if [[ $current_time == "$schedule_time"  ]]; then
+    existing_schedule_status=$(grep -E "^Schedule-$schedule_num\." "$SCHEDULE_STATUS_FILE")
+    if [ -n "$existing_schedule_status" ]; then
+        sed -i "s|^Schedule-$schedule_num\..*|Schedule-$schedule_num. $schedule|" "$SCHEDULE_STATUS_FILE"
+    else
+      # echo "Schedule-$schedule_num. $schedule" >> "$SCHEDULE_STATUS_FILE"
+      sed -i "/^Schedule-$schedule_num\./d" "$SCHEDULE_STATUS_FILE"
+      awk -v sch="Schedule-$schedule_num. $schedule" -v num="$schedule_num" '
+        BEGIN {
+          inserted = 0;
+        }
+        {
+          if ($0 ~ /^Schedule-[0-9]+\./) {
+            split($0, arr, /[.-]/);
+            schedule_number = arr[2];
+            if (schedule_number > num && inserted == 0) {
+              print sch;
+              inserted = 1;
+            }
+          }
+          print;
+        }
+        END {
+          if (inserted == 0) {
+            print sch;
+          }
+        }
+      ' "$SCHEDULE_STATUS_FILE" > "$SCHEDULE_STATUS_FILE.tmp"
+      mv "$SCHEDULE_STATUS_FILE.tmp" "$SCHEDULE_STATUS_FILE"
+    fi
+
+    # Notify the user with the schedule and play its wav file
+    notify-send -i scheduler-icon "$schedule" -t 10000
+    mpv "$SCHEDULER_VOICES_DEST/$VOICE/$schedule_num.wav"
+
+    # Sleep until completion time is reached
+    sleep "$completion_time"
+
+    # Play a message asking the user to confirm the completion of the schedule
+    mpv "$SCHEDULER_VOICES_DEST/$VOICE/askcomplete.wav"
+    sleep 2s
+
+    # Display a menu for the user to confirm whether the schedule is completed or not
+    scheduleConfirmMenu() {
+      printf "1. Yes\n"
+      printf "2. No"
+    }
+
+    # Check the value of $DEFAULT_COMPLETION_PROMPT variable and execute the corresponding command
+    if [[ $DEFAULT_COMPLETION_PROMPT == "rofi" ]]; then
+        # Display the menu and wait for user input using Rofi
+        userChoice=$(scheduleConfirmMenu | rofi -dmenu -i -l 20 -p "Choose option:" | awk '{ print substr( $0, 4 ) }')
+    elif [[ $DEFAULT_COMPLETION_PROMPT == "dmenu" ]]; then
+        # Display the menu and wait for user input using Dmenu
+        userChoice=$(scheduleConfirmMenu | dmenu -i -l 20 -p "Choose option:" | awk '{ print substr( $0, 4 ) }')
+    fi
+
+    # Play a message based on the user's choice
+    if [[ $userChoice == "Yes" ]]; then
+      mpv "$SCHEDULER_VOICES_DEST/$VOICE/complete.wav"
+      sed -i "/^Schedule-$schedule_num\./ {/ \[✔] Completed\| \[X] Not Completed/! s/$/ [✔] Completed/}" "$SCHEDULE_STATUS_FILE"
+    else
+      mpv "$SCHEDULER_VOICES_DEST/$VOICE/notcomplete.wav"
+      sed -i "/^Schedule-$schedule_num\./ {/ \[✔] Completed\| \[X] Not Completed/! s/$/ [X] Not Completed/}" "$SCHEDULE_STATUS_FILE"
+    fi
+  fi
+
+  # Check the schedule at the beginning of each minute
+  remaining_seconds=$((60 - $(date +%S)))
+  sleep "$remaining_seconds"
+done
+
+# Remove the lock file when the script exits
+rm -f "$LOCKFILE"
