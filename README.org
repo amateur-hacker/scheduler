@@ -5,7 +5,6 @@
 - [[#schedulercli][Scheduler(CLI)]]
   - [[#options][Options:]]
   - [[#usage][Usage:]]
-- [[#schedulergui][Scheduler(GUI)]]
 - [[#installation-instructions][Installation Instructions]]
 - [[#installing-scheduler][Installing Scheduler]]
 
@@ -14,7 +13,7 @@
 #+ATTR_HTML: :alt Scheduler scrot :title Scheduler Scrot :align left
 [[https://github.com/amateur-hacker/dotfiles/blob/main/screenshots/sch-preview.png]]
 
-Scheduler is a program that reads a schedule file and performs scheduled tasks at their designated times. It provides audio notifications for the schedule and prompts the user to confirm completion. The program features a Command Line Interface (CLI) written in Bash, which enables users to add, list, and delete scheduled tasks. Additionally, it includes a Graphical User Interface (GUI) application written in Python using the Gtk library, which offers the same functionality as the CLI.
+Scheduler is a program that reads a schedule file and performs scheduled tasks at their designated times. It provides audio notifications for the schedule and prompts the user to confirm completion. The program features a Command Line Interface (CLI) written in Bash, which enables users to add, list, and delete scheduled tasks.
 
 * Scheduler(CLI)
 
@@ -190,9 +189,6 @@ sch -dsc 4
 *** Note:
 1. The lus, luc, dus and duc flags will work when the "LIST/DELETE_UP_TO_SCHEDULE_DIRECTION" and "LIST/DELETE_UP_TO_COMPLETION_DIRECTION" variables in the .config/scheduler/config file are set to "last".
 2. The lus, luc, dus, and duc flag working because the default argument is set to 1 for both list/delete up to schedule and list/delete up to completion status.
-
-* Scheduler(GUI)
-It has same features as mentioned above for CLI version but it is a gui version written in python.
 
 * Installation Instructions
 - This program is designed only for linux users.
