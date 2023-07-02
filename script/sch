@@ -546,6 +546,11 @@ delete_all_completions() {
       echo "All Schedules Completion status Deleted!"
   fi
 }
+
+update_scheduler() {
+  bash "$HOME/.cache/scheduler-updates/update-apply.sh"
+}
+
 # Main script logic
 main() {
     # Process command line arguments
@@ -603,6 +608,10 @@ main() {
             -dac)
                 shift
                 delete_all_completions "$@"
+                ;;
+            -u)
+                shift
+                update_scheduler "$@"
                 ;;
             -h|--help)
                 usage
