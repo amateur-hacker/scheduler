@@ -9,14 +9,14 @@
 # Check if the temp_update.sh script does not exist in /tmp folder
 if [[ ! -f /tmp/temp_update.sh ]]; then
   # Download the latest version of the update.sh script into /tmp folder
-  cd /tmp && wget -O temp_update.sh https://gitlab.com/amateur_hacker/scheduler/-/raw/master/update.sh &>/dev/null && chmod +x temp_update.sh
+  cd /tmp && wget -O temp_update.sh https://github.com/amateur-hacker/scheduler/-/raw/master/update.sh &>/dev/null && chmod +x temp_update.sh
 
 # Check if the temp_update.sh script exist
 else
   # Remove the existing temp_update.sh script from /tmp folder
   rm -rf /tmp/temp_update.sh
   # Download the latest version of the update.sh script into /tmp folder
-  cd /tmp && wget -O temp_update.sh https://gitlab.com/amateur_hacker/scheduler/-/raw/master/update.sh &>/dev/null && chmod +x temp_update.sh
+  cd /tmp && wget -O temp_update.sh https://github.com/amateur-hacker/scheduler/-/raw/master/update.sh &>/dev/null && chmod +x temp_update.sh
 fi
 
 # Check if there are any differences between the temp_update.sh script and the one stored in the cache folder
@@ -25,7 +25,7 @@ if diff /tmp/temp_update.sh "$HOME/.cache/scheduler-updates/update.sh" &>/dev/nu
   sleep 2s
 else 
   # Clone the scheduler repository into /tmp folder and run the update.sh script
-  cd /tmp && git clone https://gitlab.com/amateur_hacker/scheduler.git &>/dev/null
+  cd /tmp && git clone https://github.com/amateur-hacker/scheduler.git &>/dev/null
   cd /tmp/scheduler/ && ./update.sh
 
   # Update the latest update.sh file in the ~/.cache/scheduler-updates folder
@@ -34,4 +34,3 @@ fi
 
 # Remove the temp_update.sh script
 rm -rf /tmp/temp_update.sh
-
