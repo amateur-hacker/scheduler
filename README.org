@@ -34,6 +34,7 @@ The command line interface (CLI) for Scheduler is named "sch" and is written in 
 - -lac: List all schedules completion status.
 - -das: Delete all schedules.
 - -dac: Delete all schedules completion status.
+- -u: To update the Scheduler.
 - -h | --help: To see usage of sch program.
 
 ** Usage:
