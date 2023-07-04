@@ -11,5 +11,5 @@
 # Upcoming features in the scheduler:
 
 # 1. GUI version of the scheduler will be available soon.
-# 2. Key mappings will be available in the scheduler.
+# 2. Key mappings will be also available in the scheduler (GUI).
 # 3. You will be able to add more than 10 schedules per day.
