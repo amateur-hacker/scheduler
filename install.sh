@@ -3,7 +3,7 @@
 ###############################################################################################################################
 # Description: This script installs the Scheduler program on any linux distribution, including dependencies and required files.
 # Dependencies: It is compatible with package managers apt, dnf, pacman, and zypper.
-# Source: https://gitlab.com/amateur_hacker/scheduler.git
+# Source: https://github.com/amateur-hacker/scheduler.git
 # Usage: ./install.sh
 # Author: Amateur Hacker
 ###############################################################################################################################
