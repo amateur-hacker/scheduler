@@ -138,9 +138,7 @@ rsync -arvP ./script/* "$HOME/.local/bin/"
 
 if ! ps -ef | grep -v grep | grep -q "check-schedule"; then
   echo "Starting the background process to check the schedule for the first time, it will be automatically handled after that."
-  sleep 1s
   bash "$HOME/.local/bin/check-schedule-bg"
-  echo "Finished ..."
 else
   :
 fi
