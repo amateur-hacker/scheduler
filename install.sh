@@ -94,11 +94,6 @@ else
   eval "$install_command ${missing_deps[*]}"
 fi
 
-# Autostart the scheduler script as a background process upon login.
-if ! grep -q '^\[Desktop Entry\]' "./.config/autostart/check-schedule-bg.desktop" && ! grep -q "^Exec=$HOME/.local/bin/check-schedule-bg" "./.config/autostart/check-schedule-bg.desktop"; then
-    sed -i "1i [Desktop Entry]\nExec=$HOME/.local/bin/check-schedule-bg" "./.config/autostart/check-schedule-bg.desktop"
-fi
-
 # Copy files to appropriate directories
 echo ""
 echo "#########################################################################################"
