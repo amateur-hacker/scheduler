@@ -12,12 +12,10 @@
 #+ATTR_HTML: :alt Scheduler scrot :title Scheduler Scrot :align left
 [[https://github.com/amateur-hacker/dotfiles/blob/master/scheduler-pngs/schwithnotification.png]]
 
-\\
 
 #+ATTR_HTML: :alt Scheduler scrot :title Scheduler Scrot :align left
 [[https://github.com/amateur-hacker/dotfiles/blob/master/scheduler-pngs/schwithrofi.png]]
 
-\\
 
 #+ATTR_HTML: :alt Scheduler scrot :title Scheduler Scrot :align left
 [[https://github.com/amateur-hacker/dotfiles/blob/master/scheduler-pngs/schwithcommands.png]]
