@@ -7,7 +7,7 @@
 #  ███████║╚██████╗██║  ██║███████╗██████╔╝╚██████╔╝███████╗███████╗██║  ██║
 #  ╚══════╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═════╝  ╚═════╝ ╚══════╝╚══════╝╚═╝  ╚═╝
 #
-# https://gitlab.com/amateur_hacker/scheduler.git
+# https://github.com/amateur-hacker/scheduler.git
 
 # shellcheck disable=SC2034
 
