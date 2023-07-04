@@ -34,8 +34,10 @@ The command line interface (CLI) for Scheduler is named "sch" and is written in 
 - -lac: List all schedules completion status.
 - -das: Delete all schedules.
 - -dac: Delete all schedules completion status.
-- -u: To update the Scheduler.
-- -h | --help: To see usage of sch program.
+- -u | --update: To update the scheduler.
+- -r | --restart: To restart the scheduler.
+- -v | --version: To see the version number of scheduler.
+- -h | --help: To see usage of scheduler program.
 
 ** Usage:
 
@@ -186,6 +188,18 @@ sch -dsc 4
 
 *** Delete last schedule completion status
 - sch -duc
+
+*** To update the scheduler.
+- sch -u | --update
+
+*** To restart the scheduler.
+- sch -r | --restart
+
+*** To see the version number of scheduler.
+- sch -v | --version
+
+*** To see usage of scheduler program.
+- sch -h | --help
 
 *** Note:
 1. The lus, luc, dus and duc flags will work when the "LIST/DELETE_UP_TO_SCHEDULE_DIRECTION" and "LIST/DELETE_UP_TO_COMPLETION_DIRECTION" variables in the .config/scheduler/config file are set to "last".
