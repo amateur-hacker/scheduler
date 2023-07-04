@@ -61,20 +61,23 @@ number_to_word1() {
 usage() {
     echo "Usage: $SCRIPT_NAME [options]"
     echo "Options:"
-    echo "  -a SCHEDULE     Add a new schedule"
-    echo "  -lus [NUM]      List schedules, up to NUM (default: 1)."
-    echo "  -luc [NUM]      List schedule completion status, up to NUM (default: 1)."
-    echo "  -dus [NUM]      Delete schedules, up to NUM (default: 1)"
-    echo "  -duc [NUM]      Delete schedule completion status, up to NUM (default: 1)"
-    echo "  -lss [NUM]      List the schedules with the specific schedule number of your choice."
-    echo "  -lsc [NUM]      List the schedule completion status with the specific schedule number of your choice."
-    echo "  -dss [NUM]      Delete the schedule with the specific schedule number of your choice."
-    echo "  -dsc [NUM]      Delete the completion completion status with the specific schedule number of your choice."
-    echo "  -las            List all schedules"
-    echo "  -lac            List all schedules completion status." 
-    echo "  -das            Delete all schedules"
-    echo "  -dac            Delete all completion completion status"
-    echo "  -h | --help     To see usage of sch program"
+    echo '  -a   "SCHEDULE"   Add a new schedule'
+    echo '  -lus "NUM"        List schedules, up to NUM (default: 1).'
+    echo '  -luc "NUM"        List schedule completion status, up to NUM (default: 1).'
+    echo '  -dus "NUM"        Delete schedules, up to NUM (default: 1)'
+    echo '  -duc "NUM"        Delete schedule completion status, up to NUM (default: 1)'
+    echo '  -lss "NUM"        List the schedules with the specific schedule number of your choice.'
+    echo '  -lsc "NUM"        List the schedule completion status with the specific schedule number of your choice.'
+    echo '  -dss "NUM"        Delete the schedule with the specific schedule number of your choice.'
+    echo '  -dsc "NUM"        Delete the completion completion status with the specific schedule number of your choice.'
+    echo '  -las              List all schedules'
+    echo '  -lac              List all schedules completion status.' 
+    echo '  -das              Delete all schedules'
+    echo '  -dac              Delete all completion completion status'
+    echo '  -u | --update     To update the scheduler program.'
+    echo '  -r | --restart    To restart the scheduler program.'
+    echo '  -v | --version    To check the version number of scheduler.'
+    echo '  -h | --help       To see usage of sch program'
 }
 
 # Add a new schedule
@@ -551,6 +554,26 @@ update_scheduler() {
   bash "$HOME/.cache/scheduler-updates/update-apply.sh"
 }
 
+restart_scheduler() {
+  check_schedule_bg_status=$(ps -ef | grep "check-schedule" | grep -v grep | awk '{print $2}')
+  if [ -n "$check_schedule_bg_status" ]; then
+    echo "Killing the previous check-schedule instance."
+    sleep 1s
+    ps -ef | grep "check-schedule" | grep -v grep | awk '{print $2}' | xargs -r kill
+    echo "Spawning the check-schedule new instance as a background process."
+    sleep 1s
+    bash "$HOME/.local/bin/check-schedule-bg"
+    echo "Finished ..."
+  else
+    echo "No check-schedule instance exist."
+    sleep 1s
+    echo "Spawining the new instance of check-schedule as a background process."
+    bash "$HOME/.local/bin/check-schedule-bg"
+    sleep 1s
+    echo "Finished ..."
+  fi
+ }
+
 # Main script logic
 main() {
     # Process command line arguments
@@ -609,9 +632,12 @@ main() {
                 shift
                 delete_all_completions "$@"
                 ;;
-            -u)
+            -u|--update)
                 shift
                 update_scheduler "$@"
+                ;;
+            -r|--restart)
+                restart_scheduler
                 ;;
             -h|--help)
                 usage

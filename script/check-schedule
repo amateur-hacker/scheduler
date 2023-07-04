@@ -197,7 +197,7 @@ while true; do
   fi
 
   # Check the schedule at the beginning of each minute
-  remaining_seconds=$((60 - $(date +%S)))
+  remaining_seconds=$((60 - $(date +%-S)))
   sleep "$remaining_seconds"
 done
 
