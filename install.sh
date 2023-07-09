@@ -137,7 +137,6 @@ fi
 rsync -arvP ./script/* "$HOME/.local/bin/"
 
 if ! ps -ef | grep -v grep | grep -q "check-schedule"; then
-  echo "Starting the background process to check the schedule for the first time, it will be automatically handled after that."
   bash "$HOME/.local/bin/check-schedule-bg"
 else
   :
@@ -176,12 +175,10 @@ else
 fi
 
 if [[ ! -d "$HOME/.cache/scheduler-updates" ]]; then
-  echo "Adding update.sh and update-apply.sh file in .cache/scheduler-updates folder for udpate purposes"
   mkdir -p "$HOME/.cache/scheduler-updates"
   rsync -arvP ./update.sh "$HOME/.cache/scheduler-updates"
   rsync -arvP ./update-apply.sh "$HOME/.cache/scheduler-updates"
 else
-  echo "Adding update.sh and update-apply.sh file in .cache/scheduler-updates folder for udpate purposes"
   rsync -arvP ./update.sh "$HOME/.cache/scheduler-updates"
   rsync -arvP ./update-apply.sh "$HOME/.cache/scheduler-updates"
 fi
