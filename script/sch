@@ -574,6 +574,13 @@ restart_scheduler() {
   fi
  }
 
+# Display help options if no arguments are provided
+if [[ "$#" -eq 0 ]]; then
+  usage 
+  exit 1
+fi
+
+
 # Main script logic
 main() {
     # Process command line arguments
