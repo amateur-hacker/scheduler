@@ -10,15 +10,15 @@
 
 
 #+ATTR_HTML: :alt Scheduler scrot :title Scheduler Scrot :align left
-[[https://github.com/amateur-hacker/dotfiles/blob/master/scheduler-pngs/schwithnotification.png]]
+[[https://github.com/amateur-hacker/dotfiles/blob/master/scheduler-preview/schwithnotification.png]]
 
 
 #+ATTR_HTML: :alt Scheduler scrot :title Scheduler Scrot :align left
-[[https://github.com/amateur-hacker/dotfiles/blob/master/scheduler-pngs/schwithrofi.png]]
+[[https://github.com/amateur-hacker/dotfiles/blob/master/scheduler-preview/schwithrofi.png]]
 
 
 #+ATTR_HTML: :alt Scheduler scrot :title Scheduler Scrot :align left
-[[https://github.com/amateur-hacker/dotfiles/blob/master/scheduler-pngs/schwithcommands.png]]
+[[https://github.com/amateur-hacker/dotfiles/blob/master/scheduler-preview/schwithcommands.png]]
 
 Scheduler is a program that reads a schedule file and performs scheduled tasks at their designated times. It provides audio notifications for the schedule and prompts the user to confirm completion. The program features a Command Line Interface (CLI) written in Bash, which enables users to add, list, and delete scheduled tasks.
 
